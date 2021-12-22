@@ -21,10 +21,7 @@ func main() {
 	}
 	defer postrgresDB.Close()
 
-	err = repository.RunPgMigrations(cfg)
-	if err != nil {
-		panic(err)
-	}
+	_ = repository.RunPgMigrations(cfg)
 
 	hdlr := handler.NewHandler(cfg, log, repository.New(postrgresDB))
 	rest := server.NewServer(hdlr)

@@ -40,7 +40,7 @@ func (r *repository) UpdateBook(ctx context.Context, book models.Book) error {
 	_, err := r.PostgresDB.ExecContext(ctx,
 		`UPDATE books 
     		SET author = $1, name = $2, count_in_library =$3, updated_at = $4
-			WHERE id = $4`, book.Author, book.Name, book.CountInLibrary, time.Now().Unix(), book.ID)
+			WHERE id = $5`, book.Author, book.Name, book.CountInLibrary, time.Now().Unix(), book.ID)
 	if err != nil {
 		return err
 	}

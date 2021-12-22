@@ -33,7 +33,7 @@ func (s *Server) Routing() {
 
 	gRating := s.Router.Group("/rating")
 	gRating.GET("/all_time", s.Handler.RatingAllTime)
-	gRating.GET("/ten_days", s.Handler.RatingReserved)
+	gRating.GET("/reserved", s.Handler.RatingReserved)
 }
 
 func NewServer(hdlr *handler.Handler) *Server {
