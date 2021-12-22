@@ -14,22 +14,22 @@ import (
 func (h *Handler) TakeBook(c echo.Context) error {
 	claims := new(myJwt.Claims)
 	err := json.Unmarshal(c.Get("claims").([]byte), claims)
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
 
-	bookId := c.Param("bookId")
-	if bookId == "" {
+	bookID := c.Param("bookId")
+	if bookID == "" {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse("book id is empty"))
 	}
 
-	bookIdInt, err := strconv.Atoi(bookId)
+	bookIDInt, err := strconv.Atoi(bookID)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
-
 	}
 
-	userReservation, err := h.takeBook(*claims, bookIdInt)
+	userReservation, err := h.takeBook(*claims, bookIDInt)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
@@ -44,8 +44,8 @@ func (h *Handler) TakeBook(c echo.Context) error {
 	return c.JSON(http.StatusOK, takeBookResponse{userReservation.UserID, userReservation.ReservationBooks})
 }
 
-func (h *Handler) takeBook(claims myJwt.Claims, bookId int) (models.ReservationBook, error) {
-	book, err := h.Repository.TakeBookByID(context.Background(), bookId)
+func (h *Handler) takeBook(claims myJwt.Claims, bookID int) (models.ReservationBook, error) {
+	book, err := h.Repository.TakeBookByID(context.Background(), bookID)
 	if err != nil {
 		return models.ReservationBook{}, err
 	}
@@ -54,26 +54,27 @@ func (h *Handler) takeBook(claims myJwt.Claims, bookId int) (models.ReservationB
 		return models.ReservationBook{}, errors.New("this book ended in library")
 	}
 
-	userId, err := strconv.Atoi(claims.Id)
+	userID, err := strconv.Atoi(claims.Id)
 	if err != nil {
 		return models.ReservationBook{}, err
 	}
 
-	userResAcc, err := h.Repository.TakeUserReservationByID(context.Background(), userId)
+	userResAcc, err := h.Repository.TakeUserReservationByID(context.Background(), userID)
 	if err != nil {
 		return models.ReservationBook{}, err
 	}
+
 	if len(userResAcc.ReservationBooks) >= 5 {
 		return models.ReservationBook{}, errors.New("you have reached your book limit")
 	}
 
 	for _, v := range userResAcc.ReservationBooks {
-		if v == bookId {
+		if v == bookID {
 			return models.ReservationBook{}, errors.New("you have already reserve this book")
 		}
 	}
 
-	userResAcc.ReservationBooks = append(userResAcc.ReservationBooks, bookId)
+	userResAcc.ReservationBooks = append(userResAcc.ReservationBooks, bookID)
 
 	err = h.Repository.UpdateUserReservationAcc(context.Background(), userResAcc)
 	if err != nil {
@@ -83,9 +84,13 @@ func (h *Handler) takeBook(claims myJwt.Claims, bookId int) (models.ReservationB
 	book.CountInLibrary--
 	err = h.Repository.UpdateBook(context.Background(), book)
 
+	if err != nil {
+		return models.ReservationBook{}, err
+	}
+
 	err = h.Repository.InsertStoryField(context.Background(), models.StoryReservation{
-		UserID: userId,
-		BookID: bookId,
+		UserID: userID,
+		BookID: bookID,
 	})
 	if err != nil {
 		return models.ReservationBook{}, err
@@ -97,6 +102,7 @@ func (h *Handler) takeBook(claims myJwt.Claims, bookId int) (models.ReservationB
 func (h *Handler) BlockUser(c echo.Context) error {
 	claims := new(myJwt.Claims)
 	err := json.Unmarshal(c.Get("claims").([]byte), claims)
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
@@ -105,20 +111,21 @@ func (h *Handler) BlockUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse("you are not admin"))
 	}
 
-	userId := c.Param("userId")
-	if userId == "" {
+	userID := c.Param("userId")
+	if userID == "" {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse("userId id is empty"))
 	}
 
-	userIdInt, err := strconv.Atoi(userId)
+	userIDInt, err := strconv.Atoi(userID)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
 
-	user, err := h.Repository.TakeUserByID(context.Background(), userIdInt)
+	user, err := h.Repository.TakeUserByID(context.Background(), userIDInt)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
+
 	user.IsBlocked = true
 
 	err = h.Repository.UpdateUser(context.Background(), user)
@@ -140,7 +147,6 @@ func (h *Handler) RatingAllTime(c echo.Context) error {
 	resp, err := h.Repository.RatingAllTime(context.Background())
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
-
 	}
 
 	result := make([]ratingResponse, len(resp))
@@ -155,7 +161,6 @@ func (h *Handler) RatingReserved(c echo.Context) error {
 	resp, err := h.Repository.RatingReserved(context.Background())
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
-
 	}
 
 	result := make([]ratingResponse, len(resp))

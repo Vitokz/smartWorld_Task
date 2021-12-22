@@ -20,6 +20,7 @@ func (r *registrationRequest) validate() error {
 	case r.Role == "":
 		return errors.New("role is empty")
 	}
+
 	return nil
 }
 
@@ -35,6 +36,7 @@ func (l *loginUserRequest) validate() error {
 	case l.Password == "":
 		return errors.New("password is empty")
 	}
+
 	return nil
 }
 

@@ -50,7 +50,6 @@ func NewServer(hdlr *handler.Handler) *Server {
 func newRouter() *echo.Echo {
 	router := echo.New()
 	router.Use(middleware.Logger())
-	//router.Use(middleware.Recover())
 
 	return router
 }
@@ -63,6 +62,7 @@ func extractToken(req *http.Request) string {
 	if len(strArr) == 2 {
 		return strArr[1]
 	}
+
 	return ""
 }
 
@@ -86,7 +86,9 @@ func (s *Server) AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, "failed marshal claims")
 			}
+
 			c.Set("claims", claimsByte)
+
 			return next(c)
 		}
 
@@ -95,6 +97,7 @@ func (s *Server) AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, echo.ErrUnauthorized)
 		}
 		tokens, err := s.Handler.Repository.TakeUserJWTByID(context.Background(), id)
+
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, echo.ErrUnauthorized)
 		}
@@ -105,19 +108,23 @@ func (s *Server) AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, "tokens are expired")
 		}
+
 		if refTkn != nil && refTkn.Valid {
 			claimsByte, err := json.Marshal(*claims)
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, "failed marshal claims")
 			}
+
 			c.Set("claims", claimsByte)
 
 			newAccToken, newRefreshToken, err := s.Handler.RefreshTokens(*claims)
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, echo.ErrUnauthorized)
 			}
+
 			c.Set("NewAccessToken", newAccToken)
 			c.Set("NewRefreshToken", newRefreshToken)
+
 			return next(c)
 		}
 

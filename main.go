@@ -12,22 +12,21 @@ import (
 func main() {
 	log := logger.NewLogger()
 
-	//Парсинг конфига
 	cfg := config.Parse()
 	log.Println(cfg)
 
-	postrgresDb, err := repository.NewPgSQL(context.Background(), cfg)
+	postrgresDB, err := repository.NewPgSQL(context.Background(), cfg)
 	if err != nil {
 		panic(err)
 	}
-	defer postrgresDb.Close()
+	defer postrgresDB.Close()
 
 	err = repository.RunPgMigrations(cfg)
 	if err != nil {
 		panic(err)
 	}
 
-	hdlr := handler.NewHandler(cfg, log, repository.New(postrgresDb))
+	hdlr := handler.NewHandler(cfg, log, repository.New(postrgresDB))
 	rest := server.NewServer(hdlr)
 
 	rest.Router.Logger.Fatal(rest.Router.Start(":" + cfg.Port))

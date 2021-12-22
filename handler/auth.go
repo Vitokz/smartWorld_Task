@@ -28,6 +28,7 @@ func (h *Handler) Registration(c echo.Context) error {
 			"err: ":   err,
 			"time: ":  time.Now(),
 		})
+
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
 
@@ -40,6 +41,7 @@ func (h *Handler) Registration(c echo.Context) error {
 			"err: ":   err,
 			"time: ":  time.Now(),
 		}).Error()
+
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
 
@@ -50,6 +52,7 @@ func (h *Handler) Registration(c echo.Context) error {
 			"err: ":   err,
 			"time: ":  time.Now(),
 		}).Error()
+
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
 
@@ -66,6 +69,7 @@ func (h *Handler) Login(c echo.Context) error {
 			"err: ":   err,
 			"time: ":  time.Now(),
 		}).Error()
+
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
 
@@ -78,6 +82,7 @@ func (h *Handler) Login(c echo.Context) error {
 			"err: ":   err,
 			"time: ":  time.Now(),
 		}).Error()
+
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
 
@@ -88,6 +93,7 @@ func (h *Handler) Login(c echo.Context) error {
 			"err: ":   err,
 			"time: ":  time.Now(),
 		}).Error()
+
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
 
@@ -97,11 +103,13 @@ func (h *Handler) Login(c echo.Context) error {
 func (h *Handler) Logout(c echo.Context) error {
 	claims := new(myJwt.Claims)
 	err := json.Unmarshal(c.Get("claims").([]byte), claims)
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
 
 	id, err := strconv.Atoi(claims.Id)
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, NewErrorResponse(err.Error()))
 	}
@@ -139,6 +147,7 @@ func (h *Handler) registration(ctx context.Context, user registrationRequest) (s
 		AccessToken:  accToken,
 		RefreshToken: refrreshToken,
 	})
+
 	if err != nil {
 		return "", "", err
 	}
@@ -147,6 +156,7 @@ func (h *Handler) registration(ctx context.Context, user registrationRequest) (s
 		UserID:           id,
 		ReservationBooks: make([]int, 0),
 	})
+
 	if err != nil {
 		return "", "", err
 	}
@@ -157,9 +167,10 @@ func (h *Handler) registration(ctx context.Context, user registrationRequest) (s
 func (h *Handler) login(ctx context.Context, user loginUserRequest) (string, string, error) {
 	dbUser, err := h.Repository.TakeUserByLogin(ctx, user.Login)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return "", "", errors.New("not found user with this login")
 		}
+
 		return "", "", err
 	}
 
@@ -167,7 +178,7 @@ func (h *Handler) login(ctx context.Context, user loginUserRequest) (string, str
 		return "", "", errors.New("incorrect password")
 	}
 
-	if dbUser.IsBlocked == true {
+	if dbUser.IsBlocked {
 		return "", "", errors.New("you are blocked")
 	}
 
@@ -228,5 +239,6 @@ func (h *Handler) RefreshTokens(claims myJwt.Claims) (string, string, error) {
 func Hash(password string) string {
 	hash := sha1.New()
 	hash.Write([]byte(password))
+
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }

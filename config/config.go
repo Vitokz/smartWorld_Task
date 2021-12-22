@@ -13,7 +13,7 @@ type Config struct {
 
 type Postgres struct {
 	Dsn           string
-	Url           string
+	URL           string
 	MigrationPath string
 }
 
@@ -34,9 +34,9 @@ func Parse() *Config {
 		pgDsn = "host=postgres port=5432 user=postgres password=postgres dbname=library sslmode=disable"
 	}
 
-	pgUrl, exists := os.LookupEnv("POSTGRES_URL")
+	pgURL, exists := os.LookupEnv("POSTGRES_URL")
 	if !exists {
-		pgUrl = "postgres://postgres:postgres@postgres/library?sslmode=disable"
+		pgURL = "postgres://postgres:postgres@postgres/library?sslmode=disable"
 	}
 
 	pgMigrationPath, exists := os.LookupEnv("POSTGRES_MIG_PATH")
@@ -53,7 +53,9 @@ func Parse() *Config {
 	if err != nil {
 		accExpToken = 60
 	}
+
 	refreshExpToken, err := strconv.Atoi(os.Getenv("JWT_REFRESH_TOKEN_EXPIRED"))
+
 	if err != nil {
 		refreshExpToken = 360
 	}
@@ -62,7 +64,7 @@ func Parse() *Config {
 		Port: envPort,
 		Postgres: Postgres{
 			Dsn:           pgDsn,
-			Url:           pgUrl,
+			URL:           pgURL,
 			MigrationPath: pgMigrationPath,
 		},
 		Jwt: JWT{

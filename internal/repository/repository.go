@@ -69,24 +69,23 @@ func NewPgSQL(ctx context.Context, cfg *config.Config) (*sqlx.DB, error) {
 }
 
 func RunPgMigrations(cfg *config.Config) error {
-
 	if cfg.Postgres.MigrationPath == "" {
 		return nil
 	}
 
-	if cfg.Postgres.Url == "" {
+	if cfg.Postgres.URL == "" {
 		return errors.New("No cfg.PgURL provided")
 	}
 
 	m, err := migrate.New(
 		cfg.Postgres.MigrationPath,
-		cfg.Postgres.Url,
+		cfg.Postgres.URL,
 	)
 	if err != nil {
 		return err
 	}
 
-	if err = m.Up(); err != nil && err != migrate.ErrNoChange {
+	if err = m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return err
 	}
 

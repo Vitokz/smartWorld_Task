@@ -64,24 +64,28 @@ func (r *repository) DeleteUserByID(ctx context.Context, id int) error {
 	_, err = tx.ExecContext(ctx, "DELETE FROM users_jwt_tokens WHERE id_user = $1", id)
 	if err != nil {
 		_ = tx.Rollback()
+
 		return err
 	}
 
 	_, err = tx.ExecContext(ctx, "DELETE FROM reservation_books WHERE id_user = $1", id)
 	if err != nil {
 		_ = tx.Rollback()
+
 		return err
 	}
 
 	_, err = tx.ExecContext(ctx, "DELETE FROM users WHERE id = $1", id)
 	if err != nil {
 		_ = tx.Rollback()
+
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		_ = tx.Rollback()
+
 		return err
 	}
 
