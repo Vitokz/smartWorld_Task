@@ -2,9 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Vitokz/smartWorld_Task/config"
 	"github.com/Vitokz/smartWorld_Task/internal/models"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -62,4 +66,29 @@ func NewPgSQL(ctx context.Context, cfg *config.Config) (*sqlx.DB, error) {
 	}
 
 	return db, nil
+}
+
+func RunPgMigrations(cfg *config.Config) error {
+
+	if cfg.Postgres.MigrationPath == "" {
+		return nil
+	}
+
+	if cfg.Postgres.Url == "" {
+		return errors.New("No cfg.PgURL provided")
+	}
+
+	m, err := migrate.New(
+		cfg.Postgres.MigrationPath,
+		cfg.Postgres.Url,
+	)
+	if err != nil {
+		return err
+	}
+
+	if err = m.Up(); err != nil && err != migrate.ErrNoChange {
+		return err
+	}
+
+	return nil
 }

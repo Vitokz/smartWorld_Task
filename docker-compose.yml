@@ -5,6 +5,7 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres_smart
+    hostname: postgres
     ports:
       - 5434:5432
     environment:
@@ -12,10 +13,18 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=library
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./data/pg:/var/lib/postgresql/data
 
-#  library:
-#    restart: always
-#    image:
-#    container_name: library_smart
-#    ports:
+  library:
+    container_name: library_smart
+    hostname: library
+    depends_on:
+      - postgres
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - '8005:8005'
+    environment:
+        POSTGRES_MIG_PATH: "file://../library/cmd/migrations"
+    restart: always

@@ -12,7 +12,9 @@ type Config struct {
 }
 
 type Postgres struct {
-	Dsn string
+	Dsn           string
+	Url           string
+	MigrationPath string
 }
 
 type JWT struct {
@@ -29,7 +31,17 @@ func Parse() *Config {
 
 	pgDsn, exists := os.LookupEnv("POSTGRES_DSN")
 	if !exists {
-		pgDsn = "host=127.0.0.1 port=5434 user=postgres password=postgres dbname=library sslmode=disable"
+		pgDsn = "host=postgres port=5432 user=postgres password=postgres dbname=library sslmode=disable"
+	}
+
+	pgUrl, exists := os.LookupEnv("POSTGRES_URL")
+	if !exists {
+		pgUrl = "postgres://postgres:postgres@postgres/library?sslmode=disable"
+	}
+
+	pgMigrationPath, exists := os.LookupEnv("POSTGRES_MIG_PATH")
+	if !exists {
+		pgMigrationPath = "cmd/migrations"
 	}
 
 	signingKey, exists := os.LookupEnv("JWT_SIGNING_KEY")
@@ -47,8 +59,12 @@ func Parse() *Config {
 	}
 
 	return &Config{
-		Port:     envPort,
-		Postgres: Postgres{Dsn: pgDsn},
+		Port: envPort,
+		Postgres: Postgres{
+			Dsn:           pgDsn,
+			Url:           pgUrl,
+			MigrationPath: pgMigrationPath,
+		},
 		Jwt: JWT{
 			SigningKey:         signingKey,
 			AccessTimeExpired:  accExpToken,
