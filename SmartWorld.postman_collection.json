@@ -66,27 +66,90 @@
 		{
 			"name": "Login",
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [],
-				"url": null
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\" : \"Mantana\", \n    \"password\": \"yeaahha\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8005/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8005",
+					"path": [
+						"user",
+						"login"
+					]
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "Logout",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDAxNjI5NjUsImp0aSI6IjEiLCJuYW1lIjoidG9ueSIsImxvZ2luIjoiTWFudGFuYSIsInJvbGUiOiJ1c2VyIn0.XGrscKOpfQ4uaEgxx2vBsx3GTCZq9Yw-2m4Hn_mXszE",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
-				"url": null
+				"url": {
+					"raw": "http://localhost:8005/user/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8005",
+					"path": [
+						"user",
+						"logout"
+					]
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "Take Book",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDAxNjI5NjUsImp0aSI6IjEiLCJuYW1lIjoidG9ueSIsImxvZ2luIjoiTWFudGFuYSIsInJvbGUiOiJ1c2VyIn0.XGrscKOpfQ4uaEgxx2vBsx3GTCZq9Yw-2m4Hn_mXszE",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
-				"url": null
+				"url": {
+					"raw": "http://localhost:8005/library/take_book/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8005",
+					"path": [
+						"library",
+						"take_book",
+						"4"
+					]
+				}
 			},
 			"response": []
 		},
@@ -95,7 +158,18 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": null
+				"url": {
+					"raw": "http://localhost:8005/rating/all_time",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8005",
+					"path": [
+						"rating",
+						"all_time"
+					]
+				}
 			},
 			"response": []
 		},
@@ -104,16 +178,49 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": null
+				"url": {
+					"raw": "http://localhost:8005/rating/reserved",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8005",
+					"path": [
+						"rating",
+						"reserved"
+					]
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "Block",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDAxNjM1OTksImp0aSI6IjQiLCJuYW1lIjoidG9ueSIsImxvZ2luIjoiQWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.rDrhAagIl-qH8DdqexfnB2CtCZ-5A5FB1EwdCDEHuwg",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
-				"url": null
+				"url": {
+					"raw": "http://localhost:8005/admin/block_user/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8005",
+					"path": [
+						"admin",
+						"block_user",
+						"1"
+					]
+				}
 			},
 			"response": []
 		}
